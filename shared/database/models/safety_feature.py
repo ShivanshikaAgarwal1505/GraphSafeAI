@@ -5,7 +5,6 @@ from sqlalchemy import Integer
 
 from shared.database.models.base import Base
 
-
 class SafetyFeature(Base):
     __tablename__ = "safety_features"
 
@@ -17,14 +16,23 @@ class SafetyFeature(Base):
         nullable=False
     )
 
-    report_count = Column(
-        Integer,
+    report_count = Column(Integer, default=0)
+
+    avg_severity = Column(Float, default=0)
+
+    neighbor_report_count = Column(
+        Float,
         default=0
     )
 
-    avg_severity = Column(
+    neighbor_avg_severity = Column(
         Float,
-        default=0.0
+        default=0
+    )
+
+    degree = Column(
+        Integer,
+        default=0
     )
 
     safety_score = Column(

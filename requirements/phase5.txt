@@ -1,0 +1,15 @@
+openai
+
+langchain
+
+langchain-community
+
+langchain-openai
+
+sentence-transformers
+
+chromadb
+
+faiss-cpu
+
+neo4j

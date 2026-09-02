@@ -1,0 +1,112 @@
+# =========================
+# Python
+# =========================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# Virtual Environments
+# =========================
+
+venv311/
+venv/
+.env
+
+# =========================
+# IDE
+# =========================
+
+.vscode/
+.idea/
+
+# =========================
+# Logs
+# =========================
+
+logs/
+*.log
+
+# =========================
+# Database
+# =========================
+
+*.db
+*.sqlite3
+
+# =========================
+# Build
+# =========================
+
+build/
+dist/
+*.egg-info/
+
+# =========================
+# Testing
+# =========================
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Jupyter
+# =========================
+
+.ipynb_checkpoints/
+
+# =========================
+# Data
+# =========================
+
+data/processed/*
+!data/processed/.gitkeep
+
+data/embeddings/*
+!data/embeddings/.gitkeep
+
+# Optional:
+# data/raw/*
+# !data/raw/.gitkeep
+
+# =========================
+# Models
+# =========================
+
+artifacts/
+checkpoints/
+trained_models/
+
+# =========================
+# Neo4j
+# =========================
+
+neo4j_data/
+
+# =========================
+# Vector Databases
+# =========================
+
+vector_store/
+chroma/
+faiss_index/
+
+# =========================
+# Uploads
+# =========================
+
+storage/uploads/*
+!storage/uploads/.gitkeep
+
+storage/exports/*
+!storage/exports/.gitkeep
+
+# =========================
+# OS Files
+# =========================
+
+Thumbs.db
+.DS_Store
+desktop.ini

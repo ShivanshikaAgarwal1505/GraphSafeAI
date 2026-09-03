@@ -70,6 +70,7 @@ data/processed/*
 data/embeddings/*
 !data/embeddings/.gitkeep
 
+data/raw/*.geojson
 # Optional:
 # data/raw/*
 # !data/raw/.gitkeep
@@ -118,3 +119,5 @@ desktop.ini
 
 .DS_Store
 Thumbs.db
+
+models/**/*.pt

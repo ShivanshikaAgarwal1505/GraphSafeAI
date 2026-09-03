@@ -18,7 +18,7 @@ class EmbeddingExtractor:
             .build()
         )
 
-        model = GraphSAGEModel()
+        model = GraphSAGEModel(data.num_features, hidden_channels=32)
 
         model.load_state_dict(
             torch.load(

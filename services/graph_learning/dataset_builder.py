@@ -6,6 +6,26 @@ import torch
 from torch_geometric.data import Data
 
 
+FEATURE_COLUMNS = [
+    "report_count",
+    "avg_severity",
+    "neighbor_report_count",
+    "neighbor_avg_severity",
+    "degree",
+
+    "node_count",
+    "avg_degree",
+
+    "dead_end_count",
+    "intersection_count",
+
+    "dead_end_ratio",
+    "intersection_density",
+
+    "connectivity_score",
+]
+
+
 class DatasetBuilder:
 
     def build(self):
@@ -24,13 +44,7 @@ class DatasetBuilder:
 
         x = torch.tensor(
             node_df[
-                [
-                    "report_count",
-                    "avg_severity",
-                    "neighbor_report_count",
-                    "neighbor_avg_severity",
-                    "degree",
-                ]
+                FEATURE_COLUMNS
             ].values,
             dtype=torch.float,
         )

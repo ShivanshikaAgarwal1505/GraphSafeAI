@@ -7,8 +7,7 @@ from services.graph_learning.dataset_builder import (
 from services.graph_learning.graphsage_model import (
     GraphSAGEModel
 )
-
-
+EPOCH=250
 class Trainer:
 
     def train(self):
@@ -19,7 +18,7 @@ class Trainer:
         )
 
         model = (
-            GraphSAGEModel()
+            GraphSAGEModel(data.num_features, hidden_channels=32)
         )
 
         optimizer = (
@@ -33,7 +32,7 @@ class Trainer:
             torch.nn.MSELoss()
         )
 
-        for epoch in range(200):
+        for epoch in range(EPOCH):
 
             model.train()
 

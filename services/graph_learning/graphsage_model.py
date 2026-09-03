@@ -9,22 +9,25 @@ class GraphSAGEModel(
     torch.nn.Module
 ):
 
-    def __init__(self):
-
+    def __init__(
+        self,
+        in_channels,
+        hidden_channels=16
+    ):
         super().__init__()
 
         self.conv1 = SAGEConv(
-            5,
-            16
+            in_channels,
+            hidden_channels
         )
 
         self.conv2 = SAGEConv(
-            16,
-            16
+            hidden_channels,
+            hidden_channels
         )
 
         self.head = Linear(
-            16,
+            hidden_channels,
             1
         )
 

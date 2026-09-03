@@ -27,7 +27,7 @@ def export_dataset():
     )
 
     # -------------------------
-    # Node Features
+    # Safety Features
     # -------------------------
 
     features = (
@@ -35,11 +35,11 @@ def export_dataset():
         .all()
     )
 
-    node_rows = []
+    safety_rows = []
 
     for feature in features:
 
-        node_rows.append(
+        safety_rows.append(
             {
                 "region_id":
                     feature.region_id,
@@ -64,9 +64,30 @@ def export_dataset():
             }
         )
 
-    node_df = pd.DataFrame(
-        node_rows
+    safety_df = pd.DataFrame(
+        safety_rows
     )
+
+    # -------------------------
+    # Topology Features
+    # -------------------------
+
+    topology_df = pd.read_csv(
+        output_dir /
+        "topology_features.csv"
+    )
+
+    # -------------------------
+    # Merge Features
+    # -------------------------
+
+    node_df = safety_df.merge(
+        topology_df,
+        on="region_id",
+        how="left"
+    )
+
+    node_df.fillna(0, inplace=True)
 
     node_path = (
         output_dir /

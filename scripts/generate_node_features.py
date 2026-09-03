@@ -15,35 +15,24 @@ def main():
         "data/processed/node_region_map.csv"
     )
 
-    merged = (
-        nodes.merge(
-            mapping,
-            on="node_id"
-        )
+    merged = nodes.merge(
+        mapping,
+        on="node_id"
     )
 
     degree_map = {}
 
     for _, row in edges.iterrows():
 
-        degree_map[
-            row["source"]
-        ] = (
-            degree_map.get(
-                row["source"],
-                0
-            )
-            + 1
+        source = row["source"]
+        target = row["target"]
+
+        degree_map[source] = (
+            degree_map.get(source, 0) + 1
         )
 
-        degree_map[
-            row["target"]
-        ] = (
-            degree_map.get(
-                row["target"],
-                0
-            )
-            + 1
+        degree_map[target] = (
+            degree_map.get(target, 0) + 1
         )
 
     merged["degree"] = (
@@ -53,32 +42,57 @@ def main():
     )
 
     region_features = (
-        merged.groupby(
-            "region_id"
-        )
+        merged.groupby("region_id")
         .agg(
             node_count=(
                 "node_id",
                 "count"
             ),
+
             avg_degree=(
                 "degree",
                 "mean"
+            ),
+
+            dead_end_count=(
+                "degree",
+                lambda x: (x == 1).sum()
+            ),
+
+            intersection_count=(
+                "degree",
+                lambda x: (x >= 3).sum()
             )
         )
         .reset_index()
     )
 
     region_features[
-        "report_count"
-    ] = 0
+        "dead_end_ratio"
+    ] = (
+        region_features[
+            "dead_end_count"
+        ]
+        /
+        region_features[
+            "node_count"
+        ]
+    )
 
     region_features[
-        "avg_severity"
-    ] = 0
+        "intersection_density"
+    ] = (
+        region_features[
+            "intersection_count"
+        ]
+        /
+        region_features[
+            "node_count"
+        ]
+    )
 
     region_features[
-        "neighbor_score"
+        "connectivity_score"
     ] = (
         region_features[
             "avg_degree"
@@ -89,18 +103,8 @@ def main():
         ].max()
     )
 
-    region_features[
-        "safety_score"
-    ] = (
-        0.5
-        + 0.5
-        * region_features[
-            "neighbor_score"
-        ]
-    )
-
     region_features.to_csv(
-        "data/processed/node_features.csv",
+        "data/processed/topology_features.csv",
         index=False
     )
 

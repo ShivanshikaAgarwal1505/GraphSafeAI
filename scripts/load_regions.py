@@ -1,47 +1,69 @@
+from pathlib import Path
+
+import pandas as pd
+
 from shared.database.session import SessionLocal
 
 from shared.database.models.region import Region
-
-from shared.geo.grid_generator import (
-    ChennaiGridGenerator
-)
+from shared.database.models.region_edge import RegionEdge
+from shared.database.models.safety_feature import SafetyFeature
 
 
-def load_regions():
+def populate_regions():
 
     db = SessionLocal()
 
-    existing_count = db.query(Region).count()
+    # delete child tables first
 
-    if existing_count > 0:
-        print(
-            f"Regions already exist ({existing_count})."
+    db.query(
+        SafetyFeature
+    ).delete()
+
+    db.commit()
+
+    db.query(
+        RegionEdge
+    ).delete()
+
+    db.commit()
+
+    db.query(
+        Region
+    ).delete()
+
+    db.commit()
+
+    regions_df = pd.read_csv(
+        Path(
+            "data/processed/regions.csv"
         )
-        db.close()
-        return
+    )
 
-    generator = ChennaiGridGenerator()
-
-    regions = generator.generate()
-
-    for region in regions:
+    for _, row in regions_df.iterrows():
 
         db.add(
             Region(
-                region_name=region.region_name,
-                centroid_lat=region.centroid_lat,
-                centroid_lon=region.centroid_lon
+                id=int(row["region_id"]),
+                region_name=
+                    f"REGION_{int(row['region_id'])}",
+                centroid_lat=float(
+                    row["center_lat"]
+                ),
+                centroid_lon=float(
+                    row["center_lon"]
+                ),
+                safety_score=0.5
             )
         )
 
     db.commit()
 
     print(
-        f"{len(regions)} regions inserted."
+        f"Inserted {len(regions_df)} regions"
     )
 
     db.close()
 
 
 if __name__ == "__main__":
-    load_regions()
+    populate_regions()

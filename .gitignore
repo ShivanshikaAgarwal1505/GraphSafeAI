@@ -5,6 +5,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
+*.pyo
+*.pyd
 
 # =========================
 # Virtual Environments
@@ -110,3 +113,8 @@ storage/exports/*
 Thumbs.db
 .DS_Store
 desktop.ini
+
+# OS
+
+.DS_Store
+Thumbs.db

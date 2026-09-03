@@ -78,16 +78,36 @@ def export_dataset():
     )
 
     # -------------------------
+    # Infrastructure Features
+    # -------------------------
+
+    infrastructure_df = pd.read_csv(
+        output_dir /
+        "infrastructure_features.csv"
+    )
+
+    # -------------------------
     # Merge Features
     # -------------------------
 
-    node_df = safety_df.merge(
-        topology_df,
-        on="region_id",
-        how="left"
+    node_df = (
+        safety_df
+        .merge(
+            topology_df,
+            on="region_id",
+            how="left"
+        )
+        .merge(
+            infrastructure_df,
+            on="region_id",
+            how="left"
+        )
     )
 
-    node_df.fillna(0, inplace=True)
+    node_df.fillna(
+        0,
+        inplace=True
+    )
 
     node_path = (
         output_dir /
@@ -144,6 +164,10 @@ def export_dataset():
 
     print(
         f"Edges exported: {len(edge_df)}"
+    )
+
+    print(
+        f"Feature columns: {len(node_df.columns)}"
     )
 
     print(

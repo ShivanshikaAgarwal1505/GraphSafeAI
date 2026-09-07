@@ -60,7 +60,20 @@ def export_dataset():
                     feature.degree,
 
                 "safety_score":
-                    feature.safety_score
+                    feature.safety_score,
+
+                "high_severity_count":
+                    feature.high_severity_count,
+
+                "recent_report_count":
+                    feature.recent_report_count,
+
+                "incident_diversity":
+                    feature.incident_diversity,
+
+                "neighbor_incident_diversity":
+                    feature.neighbor_incident_diversity,
+                
             }
         )
 
@@ -84,6 +97,11 @@ def export_dataset():
     infrastructure_df = pd.read_csv(
         output_dir /
         "infrastructure_features.csv"
+    )
+
+    infrastructure_df = infrastructure_df.drop(
+        columns=["node_count"],
+        errors="ignore"
     )
 
     # -------------------------

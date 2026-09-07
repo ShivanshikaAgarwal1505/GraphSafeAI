@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 
-from shared.database.models.community_report import CommunityReport
+from shared.database.models.community_report import (
+    CommunityReport
+)
 
 
 class ReportRepository:
@@ -10,6 +12,7 @@ class ReportRepository:
         db: Session,
         report: CommunityReport
     ):
+
         db.add(report)
 
         db.commit()
@@ -17,3 +20,27 @@ class ReportRepository:
         db.refresh(report)
 
         return report
+
+    def get(
+        self,
+        db: Session,
+        report_id: int
+    ):
+
+        return (
+            db.query(
+                CommunityReport
+            )
+            .filter(
+                CommunityReport.id
+                == report_id
+            )
+            .first()
+        )
+
+    def save(
+        self,
+        db: Session
+    ):
+
+        db.commit()

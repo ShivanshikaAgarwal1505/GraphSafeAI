@@ -9,19 +9,15 @@ from shared.geo.osm.tag_parser import (
     extract_tag
 )
 
+from shared.geo.osm.amenity_config import (
+    AMENITY_TYPES
+)
+
 PBF_PATH = (
     r"C:\Users\T9978\Projects\ProjectCodes"
     r"\Railway-AI-Traffic-Optimization"
     r"\data\raw\india-latest.osm.pbf"
 )
-
-
-TARGET_AMENITIES = {
-    "police",
-    "hospital",
-    "fire_station",
-    "school",
-}
 
 
 class AmenityExtractor:
@@ -55,7 +51,7 @@ class AmenityExtractor:
             )
 
             if amenity not in (
-                TARGET_AMENITIES
+                AMENITY_TYPES
             ):
                 continue
 

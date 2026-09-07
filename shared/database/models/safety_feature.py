@@ -39,3 +39,90 @@ class SafetyFeature(Base):
         Float,
         default=0.5
     )
+
+    high_severity_count = Column(
+        Integer,
+        default=0
+    )
+
+    recent_report_count = Column(
+        Integer,
+        default=0
+    )
+
+    incident_diversity = Column(
+        Integer,
+        default=0
+    )
+
+    neighbor_incident_diversity = Column(
+        Float,
+        default=0
+    )
+
+    # category features
+
+    theft_count = Column(Integer, default=0)
+
+    harassment_count = Column(Integer, default=0)
+
+    accident_count = Column(Integer, default=0)
+
+    unsafe_area_count = Column(Integer, default=0)
+
+    streetlight_failure_count = Column(
+        Integer,
+        default=0
+    )
+
+    # temporal features
+
+    reports_last_7_days = Column(
+        Integer,
+        default=0
+    )
+
+    reports_last_30_days = Column(
+        Integer,
+        default=0
+    )
+
+    reports_last_90_days = Column(
+        Integer,
+        default=0
+    )
+
+    incident_growth_rate = Column(
+        Float,
+        default=0
+    )
+
+    structural_risk = Column(
+        Float,
+        default=0
+    )
+
+    incident_risk = Column(
+        Float,
+        default=0
+    )
+
+    incident_confidence = Column(
+        Float,
+        default=0
+    )
+
+    structural_weight = Column(
+        Float,
+        default=1
+    )
+
+    incident_weight = Column(
+        Float,
+        default=0
+    )
+
+    final_risk = Column(
+        Float,
+        default=0
+    )

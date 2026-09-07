@@ -13,3 +13,5 @@ chromadb
 faiss-cpu
 
 neo4j
+
+pysql

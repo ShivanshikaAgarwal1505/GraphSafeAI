@@ -5,40 +5,9 @@ import torch
 
 from torch_geometric.data import Data
 
-
-FEATURE_COLUMNS = [
-
-    # Safety
-
-    "report_count",
-    "avg_severity",
-    "neighbor_report_count",
-    "neighbor_avg_severity",
-    "degree",
-
-    # Topology
-
-    "node_count",
-    "avg_degree",
-
-    "dead_end_count",
-    "intersection_count",
-
-    "dead_end_ratio",
-    "intersection_density",
-
-    "connectivity_score",
-
-    # Infrastructure
-
-    "police_count",
-    "hospital_count",
-    "school_count",
-    "fire_station_count",
-
-    "amenity_count",
-    "amenity_density",
-]
+from services.graph_learning.feature_registry import (
+    FEATURE_COLUMNS
+)
 
 class DatasetBuilder:
 

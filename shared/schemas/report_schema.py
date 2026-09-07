@@ -2,12 +2,21 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from shared.enums.report_category import ReportCategory
 
+class CommunityReportCreate(
+    BaseModel
+):
 
-class CommunityReportCreate(BaseModel):
     latitude: float
+
     longitude: float
-    category: ReportCategory
+
+    category: str
+
     severity: int
+
+    description: str | None = None
+
+    source: str = "CITIZEN"
+
     timestamp: datetime

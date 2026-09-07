@@ -1,16 +1,70 @@
 import pandas as pd
+import numpy as np
+
+from shared.geo.osm.amenity_config import (
+    AMENITY_TYPES
+)
 
 
-GRID_SIZE = 0.005
-
-
-def get_grid(
-    latitude,
-    longitude
+def haversine(
+    lat1,
+    lon1,
+    lat2,
+    lon2
 ):
-    return (
-        int(longitude // GRID_SIZE),
-        int(latitude // GRID_SIZE)
+    """
+    Distance in kilometers.
+    """
+
+    r = 6371.0
+
+    lat1 = np.radians(lat1)
+    lon1 = np.radians(lon1)
+
+    lat2 = np.radians(lat2)
+    lon2 = np.radians(lon2)
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = (
+        np.sin(dlat / 2) ** 2
+        +
+        np.cos(lat1)
+        *
+        np.cos(lat2)
+        *
+        np.sin(dlon / 2) ** 2
+    )
+
+    c = (
+        2
+        *
+        np.arcsin(
+            np.sqrt(a)
+        )
+    )
+
+    return r * c
+
+
+def nearest_distance(
+    region_lat,
+    region_lon,
+    amenity_df
+):
+    if amenity_df.empty:
+        return -1.0
+
+    distances = haversine(
+        region_lat,
+        region_lon,
+        amenity_df["latitude"].values,
+        amenity_df["longitude"].values,
+    )
+
+    return float(
+        distances.min()
     )
 
 
@@ -20,9 +74,18 @@ def main():
         "data/processed/regions.csv"
     )
 
+    node_counts = (
+        regions[
+            ["region_id", "node_count"]
+        ]
+        .copy()
+    )
+
     amenities = pd.read_csv(
         "data/raw/chennai_amenities.csv"
     )
+
+    grid_size = 0.005
 
     lookup = {}
 
@@ -39,9 +102,15 @@ def main():
 
     for _, row in amenities.iterrows():
 
-        grid = get_grid(
-            row["latitude"],
-            row["longitude"]
+        grid = (
+            int(
+                row["longitude"]
+                // grid_size
+            ),
+            int(
+                row["latitude"]
+                // grid_size
+            )
         )
 
         region_id = lookup.get(
@@ -68,12 +137,12 @@ def main():
     if mapped.empty:
 
         print(
-            "No amenities mapped"
+            "No amenities mapped."
         )
 
         return
 
-    features = (
+    counts = (
         mapped
         .pivot_table(
             index="region_id",
@@ -84,69 +153,171 @@ def main():
         .reset_index()
     )
 
-    expected = [
-        "police",
-        "hospital",
-        "school",
-        "fire_station"
-    ]
+    #
+    # Ensure all amenity columns exist
+    #
 
-    for col in expected:
+    for amenity in AMENITY_TYPES:
 
-        if col not in features.columns:
+        if amenity not in counts.columns:
 
-            features[col] = 0
+            counts[
+                amenity
+            ] = 0
 
-    features.rename(
+    #
+    # Rename dynamically
+    #
+
+    counts.rename(
         columns={
-            "police":
-                "police_count",
-
-            "hospital":
-                "hospital_count",
-
-            "school":
-                "school_count",
-
-            "fire_station":
-                "fire_station_count"
+            amenity:
+                f"{amenity}_count"
+            for amenity in AMENITY_TYPES
         },
         inplace=True
     )
 
-    features[
-        "amenity_count"
-    ] = (
-        features[
-            [
-                "police_count",
-                "hospital_count",
-                "school_count",
-                "fire_station_count"
-            ]
-        ]
+    count_columns = [
+        f"{amenity}_count"
+        for amenity in AMENITY_TYPES
+    ]
+
+    #
+    # Total amenity statistics
+    #
+
+    counts["amenity_count"] = (
+        counts[count_columns]
         .sum(axis=1)
     )
 
-    features[
-        "amenity_density"
-    ] = (
-        features[
-            "amenity_count"
-        ]
+    counts["amenity_density"] = (
+        counts["amenity_count"]
     )
 
-    result = (
-        regions[
-            ["region_id"]
+    #
+    # Dynamic density features
+    #
+
+    for amenity in AMENITY_TYPES:
+
+        count_col = (
+            f"{amenity}_count"
+        )
+
+        density_col = (
+            f"{amenity}_density"
+        )
+
+        counts[density_col] = (
+            counts[count_col]
+        )
+
+    #
+    # Amenity datasets for distance calculations
+    #
+
+    amenity_frames = {}
+
+    for amenity in AMENITY_TYPES:
+
+        amenity_frames[
+            amenity
+        ] = amenities[
+            amenities["amenity"]
+            == amenity
         ]
+
+    #
+    # Distance features
+    #
+
+    print(
+        "Calculating nearest distances..."
+    )
+
+    distance_rows = []
+
+    for _, region in regions.iterrows():
+
+        lat = region[
+            "center_lat"
+        ]
+
+        lon = region[
+            "center_lon"
+        ]
+
+        row_data = {
+            "region_id":
+                region["region_id"]
+        }
+
+        for amenity in AMENITY_TYPES:
+
+            row_data[
+                f"nearest_{amenity}_distance"
+            ] = nearest_distance(
+                lat,
+                lon,
+                amenity_frames[
+                    amenity
+                ]
+            )
+
+        distance_rows.append(
+            row_data
+        )
+
+    distance_df = pd.DataFrame(
+        distance_rows
+    )
+
+    #
+    # Merge everything
+    #
+
+    result = (
+        node_counts
         .merge(
-            features,
+            counts,
+            on="region_id",
+            how="left"
+        )
+        .merge(
+            distance_df,
             on="region_id",
             how="left"
         )
         .fillna(0)
     )
+    #
+    # Per-node density features
+    #
+
+    safe_nodes = (
+        result["node_count"]
+        .replace(0, 1)
+    )
+
+    for amenity in AMENITY_TYPES:
+
+        count_col = (
+            f"{amenity}_count"
+        )
+
+        per_node_col = (
+            f"{amenity}_per_node"
+        )
+
+        if count_col in result.columns:
+
+            result[per_node_col] = (
+                result[count_col]
+                /
+                safe_nodes
+            )
 
     result.to_csv(
         "data/processed/infrastructure_features.csv",
@@ -156,21 +327,23 @@ def main():
     print()
 
     print(
-        result[
-            [
-                "police_count",
-                "hospital_count",
-                "school_count",
-                "fire_station_count"
-            ]
-        ]
-        .sum()
+        f"Infrastructure features: {len(result)}"
     )
 
     print()
 
     print(
-        f"Infrastructure features: {len(result)}"
+        "Amenities configured:"
+    )
+
+    print(
+        AMENITY_TYPES
+    )
+
+    print()
+
+    print(
+        result.head()
     )
 
 

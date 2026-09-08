@@ -18,12 +18,6 @@ SAFETY_FEATURES = [
 
     "incident_growth_rate",
 
-    "theft_count",
-    "harassment_count",
-    "accident_count",
-    "unsafe_area_count",
-    "streetlight_failure_count",
-
     "neighbor_report_count",
     "neighbor_avg_severity",
     "neighbor_incident_diversity",

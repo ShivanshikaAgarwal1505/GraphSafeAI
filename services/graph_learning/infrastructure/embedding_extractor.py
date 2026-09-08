@@ -1,13 +1,11 @@
 import torch
-
-from services.graph_learning.dataset_builder import (
+from services.graph_learning.infrastructure.dataset_builder import (
     DatasetBuilder
 )
 
-from services.graph_learning.graphsage_model import (
+from services.graph_learning.models.graphsage_model import (
     GraphSAGEModel
 )
-
 
 class EmbeddingExtractor:
 

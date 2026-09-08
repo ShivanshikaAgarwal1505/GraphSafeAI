@@ -13,7 +13,9 @@ class SafetyFeature(Base):
     region_id = Column(
         Integer,
         ForeignKey("regions.id"),
-        nullable=False
+        nullable=False,
+        unique=True,
+        index=True
     )
 
     report_count = Column(Integer, default=0)
@@ -57,21 +59,6 @@ class SafetyFeature(Base):
 
     neighbor_incident_diversity = Column(
         Float,
-        default=0
-    )
-
-    # category features
-
-    theft_count = Column(Integer, default=0)
-
-    harassment_count = Column(Integer, default=0)
-
-    accident_count = Column(Integer, default=0)
-
-    unsafe_area_count = Column(Integer, default=0)
-
-    streetlight_failure_count = Column(
-        Integer,
         default=0
     )
 

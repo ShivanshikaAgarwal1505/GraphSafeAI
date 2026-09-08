@@ -1,24 +1,14 @@
-import torch
-
-from services.graph_learning.trainer import (
+from services.graph_learning.infrastructure.trainer import (
     Trainer
 )
 
 
 def main():
 
-    model = (
-        Trainer()
-        .train()
-    )
-
-    torch.save(
-        model.state_dict(),
-        "models/graphsage/model.pt"
-    )
+    Trainer().train()
 
     print(
-        "Model saved."
+        "Training completed."
     )
 
 

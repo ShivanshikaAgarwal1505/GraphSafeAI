@@ -16,9 +16,11 @@ from services.safety_intelligence.application.risk_refresh_service import (
     RiskRefreshService
 )
 
+from shared.database.models.region import Region
+
 repository = ReportRepository()
 
-risk_service = RiskRefreshService()
+refresh_service = RiskRefreshService()
 
 class ReportService:
 
@@ -26,6 +28,10 @@ class ReportService:
 
         self.region_mapper = (
             RegionMapper()
+        )
+
+        self.refresh_service = (
+            RiskRefreshService()
         )
 
     def create_report(
@@ -68,18 +74,22 @@ class ReportService:
             timestamp=report_data.timestamp
         )
 
-        saved_report = (
-            repository.create(
-                db=db,
-                report=report
-            )
+
+        saved_report = repository.create(
+            db=db,
+            report=report
+        )
+
+        refresh_service.refresh_region_and_neighbors(
+            db,
+            saved_report.region_id
         )
 
         return saved_report
 
-    def resolve_report(
+    def get_report(
         self,
-        db,
+        db: Session,
         report_id: int
     ):
 
@@ -89,9 +99,30 @@ class ReportService:
         )
 
         if report is None:
+
             raise ValueError(
-                "Report not found"
+                "Report not found."
             )
+
+        return report
+
+    def get_reports(
+        self,
+        db: Session
+    ):
+
+        return repository.get_all(db)
+
+    def resolve_report(
+        self,
+        db: Session,
+        report_id: int
+    ):
+
+        report = self.get_report(
+            db,
+            report_id
+        )
 
         report.status = "RESOLVED"
 
@@ -101,19 +132,14 @@ class ReportService:
 
     def reopen_report(
         self,
-        db,
+        db: Session,
         report_id: int
     ):
 
-        report = repository.get(
+        report = self.get_report(
             db,
             report_id
         )
-
-        if report is None:
-            raise ValueError(
-                "Report not found"
-            )
 
         report.status = "OPEN"
 
@@ -123,22 +149,99 @@ class ReportService:
 
     def reject_report(
         self,
-        db,
+        db: Session,
         report_id: int
     ):
 
-        report = repository.get(
+        report = self.get_report(
             db,
             report_id
         )
-
-        if report is None:
-            raise ValueError(
-                "Report not found"
-            )
 
         report.status = "REJECTED"
 
         repository.save(db)
 
         return report
+
+    def get_reports(
+        self,
+        db,
+        status=None,
+        category=None,
+        region_id=None,
+        source=None
+    ):
+
+        return repository.get_filtered(
+            db=db,
+            status=status,
+            category=category,
+            region_id=region_id,
+            source=source
+        )
+
+    def get_region_stats(
+        self,
+        db,
+        region_id
+    ):
+
+        reports = repository.get_filtered(
+            db=db,
+            region_id=region_id
+        )
+
+        categories = {}
+
+        open_count = 0
+
+        resolved_count = 0
+
+        rejected_count = 0
+
+        for report in reports:
+
+            categories[
+                report.category
+            ] = (
+
+                categories.get(
+                    report.category,
+                    0
+                )
+                + 1
+
+            )
+
+            if report.status == "OPEN":
+
+                open_count += 1
+
+            elif report.status == "RESOLVED":
+
+                resolved_count += 1
+
+            elif report.status == "REJECTED":
+
+                rejected_count += 1
+
+        return {
+
+            "region_id": region_id,
+
+            "report_count":
+                len(reports),
+
+            "open_reports":
+                open_count,
+
+            "resolved_reports":
+                resolved_count,
+
+            "rejected_reports":
+                rejected_count,
+
+            "categories":
+                categories,
+        }

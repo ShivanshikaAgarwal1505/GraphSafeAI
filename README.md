@@ -1,74 +1,112 @@
 # GraphSafeAI v2
 
-GraphSafeAI is a graph-based urban safety intelligence platform that uses OpenStreetMap road networks and Graph Neural Networks (GraphSAGE) to model spatial safety patterns.
+GraphSafeAI is a graph-based urban safety intelligence platform that combines OpenStreetMap infrastructure data, community-reported safety incidents, graph intelligence, and Graph Neural Networks (GraphSAGE) to model, analyze, and predict urban safety patterns.
 
-## Current Architecture
+The platform evolves from infrastructure-driven safety assessment toward evidence-driven risk intelligence as real-world incident reports accumulate over time.
 
-### Region Generation
+---
 
-The system derives spatial regions from OpenStreetMap road-network nodes using geographic grid aggregation.
+# Vision
 
-### Data Pipeline
+GraphSafeAI aims to answer:
 
-OpenStreetMap Road Network
-→ Region Generation
-→ Region Edge Generation
-→ Node Feature Generation
-→ Region Database
-→ Graph Dataset Export
-→ GraphSAGE Training
-→ Embedding Generation
-→ Clustering
-→ Hotspot Detection
+- Which regions are structurally vulnerable?
+- Which areas are becoming less safe over time?
+- How does risk propagate through neighboring regions?
+- What safety patterns emerge from community reports?
+- How can urban safety be continuously monitored, predicted, and improved?
 
-### Current Scale
+---
 
-- Road Nodes: ~439,067
-- Road Edges: ~486,343
-- Regions: 4,934
-- Region Edges: 12,897
-
-### Migration Status
-
-The project has completed migration from the legacy synthetic grid-based graph:
-
-Legacy:
-- 231 regions
-- 430 edges
-
-Current:
-- 4,934 OSM-derived regions
-- 12,897 region edges
-
-All graph learning and hotspot detection workflows now operate on OSM-derived spatial data.
-
-## Active Pipeline
+# System Architecture
 
 ```text
-python -m scripts.load_chennai_osm
+Community Reports
+        +
+OpenStreetMap Infrastructure
+        +
+Region Connectivity Graph
+                ↓
 
-python -m scripts.build_osm_graph
+        Safety Intelligence
+                ↓
 
-python -m scripts.generate_regions
+        Risk Intelligence
+                ↓
 
-python -m scripts.generate_region_edges
+        Feature Registry
+                ↓
 
-python -m scripts.generate_node_features
+        Dataset Builder
+                ↓
 
-python -m scripts.load_regions
+    PyTorch Geometric Dataset
+                ↓
 
-python -m scripts.build_region_graph
+        GraphSAGE Model
+                ↓
 
-python -m scripts.load_safety_features
+            Evaluator
+    (RMSE / MAE / R²)
+                ↓
 
-python -m scripts.export_graph_dataset
+            MLflow
+    Experiment Tracking
+                ↓
 
-python -m scripts.train_graphsage
+        Model Registry
+                ↓
 
-python -m scripts.export_embeddings
+            Predictor
+                ↓
 
-python -m scripts.cluster_regions
+        Predictions DB
+                ↓
 
-python -m scripts.detect_hotspots
-
+        Prediction APIs
 ```
+
+---
+
+# Development Status
+
+## Phase 1 - Spatial Intelligence
+
+Completed ✅
+
+## Phase 2 - Safety Intelligence
+
+Completed ✅
+
+## Phase 3 - Graph Learning
+
+Completed ✅
+
+- Feature Registry
+- Dynamic Dataset Builder
+- GraphSAGE Training
+- Evaluator
+- MLflow Integration
+- Model Registry
+- Predictor
+- Prediction Service
+- Prediction APIs
+- Prediction Persistence
+
+---
+
+# Roadmap
+
+## Phase 4
+
+- Routing Engine
+- Emergency Response Engine
+- GraphRAG Engine
+
+## Future Enhancements
+- Safe Route Recommendation
+- Explainable Predictions
+- Real-Time Prediction Updates
+- City Intelligence Dashboard
+- Public Safety APIs
+- Decision Support Systems

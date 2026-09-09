@@ -12,41 +12,40 @@ from shared.database.models.region import (
     Region
 )
 
+
 class PredictionService:
 
     def __init__(self):
 
-        self.predictor = (
-            Predictor()
-        )
+        self.predictor = Predictor()
 
     def generate_predictions(
-    self,
-    db
+        self,
+        db
     ):
 
         predictions = (
-        self.predictor
-        .predict_all()
+            self.predictor
+            .predict_all()
         )
 
         model_version = (
-        self.predictor
-        .get_model_version()
+            self.predictor
+            .get_model_version()
         )
 
         regions = (
-        db.query(
-            Region
-        )
-        .order_by(
-            Region.id
-        )
-        .all()
+            db.query(
+                Region
+            )
+            .order_by(
+                Region.id
+            )
+            .all()
         )
 
         db.query(
-        Prediction
+            Prediction
         ).delete()
 
         db.flush()
@@ -54,19 +53,19 @@ class PredictionService:
         records_created = 0
 
         for region, prediction in zip(
-        regions,
-        predictions
+            regions,
+            predictions
         ):
 
             db.add(
-            Prediction(
-                region_id=region.id,
-                prediction_score=float(
-                    prediction
-                ),
-                model_version=model_version,
-                generated_at=datetime.utcnow()
-            )
+                Prediction(
+                    region_id=region.id,
+                    prediction_score=float(
+                        prediction
+                    ),
+                    model_version=model_version,
+                    generated_at=datetime.utcnow()
+                )
             )
 
             records_created += 1
@@ -74,10 +73,10 @@ class PredictionService:
         db.commit()
 
         return {
-        "regions_processed": records_created,
-        "model_version": model_version
+            "regions_processed": records_created,
+            "model_version": model_version
         }
-    
+
     def get_prediction(
         self,
         db,

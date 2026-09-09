@@ -17,15 +17,11 @@ router = APIRouter(
     tags=["Graph Learning"]
 )
 
-trainer = Trainer()
-
-prediction_service = PredictionService()
-
 
 @router.post("/train")
 def train_model():
 
-    trainer.train()
+    Trainer().train()
 
     return {
         "status": "completed"
@@ -38,7 +34,8 @@ def generate_predictions(
 ):
 
     return (
-        prediction_service.generate_predictions(db)
+        PredictionService()
+        .generate_predictions(db)
     )
 
 
@@ -48,7 +45,8 @@ def get_predictions(
 ):
 
     return (
-        prediction_service.get_predictions(db)
+        PredictionService()
+        .get_predictions(db)
     )
 
 
@@ -59,7 +57,8 @@ def get_prediction(
 ):
 
     prediction = (
-        prediction_service.get_prediction(
+        PredictionService()
+        .get_prediction(
             db,
             region_id
         )

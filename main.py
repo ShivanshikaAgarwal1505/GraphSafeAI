@@ -10,6 +10,14 @@ from services.graph_learning.api.routes import (
     router as graph_learning_router
 )
 
+from services.routing_engine.api.routes import (
+    router as routing_router
+)
+
+from services.navigation_engine.api.routes import (
+    router as navigation_router
+)
+
 import logging
 
 logging.basicConfig(
@@ -42,4 +50,12 @@ async def root():
 
 app.include_router(
     graph_learning_router
+)
+
+app.include_router(
+    routing_router
+)
+
+app.include_router(
+    navigation_router
 )

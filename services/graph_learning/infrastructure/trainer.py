@@ -175,32 +175,11 @@ class Trainer:
                     "learning_rate": learning_rate
                 },
                 metrics={
-                    "final_loss": final_loss
+                    "final_loss": final_loss,
+                    "rmse": metrics["rmse"],
+                    "mae": metrics["mae"],
+                    "r2": metrics["r2"]
                 }
-            )
-
-            print(
-                "\n========== TRAINING SUMMARY =========="
-            )
-
-            print(
-                f"Final Loss : {loss.item():.6f}"
-            )
-
-            print(
-                f"RMSE       : {metrics['rmse']:.6f}"
-            )
-
-            print(
-                f"MAE        : {metrics['mae']:.6f}"
-            )
-
-            print(
-                f"R²         : {metrics['r2']:.6f}"
-            )
-
-            print(
-                "======================================\n"
             )
 
             return model

@@ -17,3 +17,5 @@ neo4j
 pysql
 
 mlflow
+
+scipy

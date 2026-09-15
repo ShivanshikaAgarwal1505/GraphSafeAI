@@ -10,6 +10,10 @@ from services.navigation_engine.application.spatial_index import (
     SpatialIndex
 )
 
+from services.navigation_engine.application.node_lookup import (
+    NodeLookup
+)
+
 from services.navigation_engine.application.cost_strategies.detour_risk_strategy import (
     DetourRiskStrategy
 )
@@ -170,6 +174,9 @@ class NavigationService:
                 "route":
                     None,
 
+                "route_coordinates":
+                    [],
+
                 "route_length":
                     0,
 
@@ -233,6 +240,34 @@ class NavigationService:
             ]
         )
 
+        #
+        # Route geometry
+        #
+        route_coordinates = []
+
+        for node_id in route:
+
+            coordinate = (
+                NodeLookup.get(
+                    node_id
+                )
+            )
+
+            if coordinate is None:
+                continue
+
+            latitude, longitude = coordinate
+
+            route_coordinates.append(
+                {
+                    "latitude":
+                        latitude,
+
+                    "longitude":
+                        longitude
+                }
+            )
+
         metrics = (
             metrics_service
             .summarize(
@@ -265,6 +300,9 @@ class NavigationService:
 
             "route":
                 route,
+
+            "route_coordinates":
+                route_coordinates,
 
             "route_length":
                 len(route),

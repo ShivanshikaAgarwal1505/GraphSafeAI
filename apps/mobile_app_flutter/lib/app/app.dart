@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
 
-import '../screens/home/home_screen.dart';
+import '../navigation/main_navigation.dart';
+import 'theme.dart';
+class GraphSafeAIApp
+    extends StatelessWidget {
 
-class GraphSafeAIApp extends StatelessWidget {
-  const GraphSafeAIApp({super.key});
+  const GraphSafeAIApp({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
+
+      debugShowCheckedModeBanner:
+          false,
+
       title: 'GraphSafeAI',
-      debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+
+      theme: AppTheme.light,
+
+      home:
+          const MainNavigation(),
     );
   }
 }

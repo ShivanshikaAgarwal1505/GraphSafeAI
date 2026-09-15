@@ -1,17 +1,27 @@
 class NavigationProfiles {
 
-  static const fastest =
-      'walking_fastest';
+  static const List<String> all = [
 
-  static const balanced =
-      'walking_balanced';
+    'walking_fastest',
+    'walking_balanced',
+    'walking_safe',
 
-  static const safe =
-      'walking_safe';
+    'driving_fastest',
+    'driving_balanced',
+    'driving_safe',
+  ];
 
-  static const profiles = [
-    fastest,
-    balanced,
-    safe,
+  static const List<String> walking = [
+
+    'walking_fastest',
+    'walking_balanced',
+    'walking_safe',
+  ];
+
+  static const List<String> driving = [
+
+    'driving_fastest',
+    'driving_balanced',
+    'driving_safe',
   ];
 }

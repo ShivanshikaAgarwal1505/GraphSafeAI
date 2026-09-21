@@ -239,7 +239,7 @@ class _ReportsScreenState
                                     width: 4,
                                   ),
                                   Text(
-                                    'Region ${report.regionId}',
+                                    report.regionName,
                                     style:
                                         const TextStyle(
                                       color: Colors

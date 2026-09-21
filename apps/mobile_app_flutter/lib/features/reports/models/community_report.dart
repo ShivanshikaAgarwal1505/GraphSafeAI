@@ -5,6 +5,8 @@ class CommunityReport {
 
   final int regionId;
 
+  final String regionName;
+
   final double latitude;
 
   final double longitude;
@@ -29,6 +31,7 @@ class CommunityReport {
     required this.id,
     required this.userId,
     required this.regionId,
+    required this.regionName,
     required this.latitude,
     required this.longitude,
     required this.category,
@@ -48,6 +51,7 @@ class CommunityReport {
       id: json['id'],
       userId: json['user_id']?? 0,
       regionId: json['region_id'],
+      regionName: json['region_name'] ?? '',
       latitude: json['latitude'].toDouble(),
       longitude: json['longitude'].toDouble(),
       category: json['category'],

@@ -1,0 +1,4 @@
+enum TravelMode {
+  walking,
+  driving,
+}

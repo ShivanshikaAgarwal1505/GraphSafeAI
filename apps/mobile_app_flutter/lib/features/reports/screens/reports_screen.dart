@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/report_request.dart';
-
-import '../../location/providers/location_provider.dart';
-
 import '../providers/reports_provider.dart';
 
 class ReportsScreen extends StatefulWidget {
@@ -19,297 +15,365 @@ class ReportsScreen extends StatefulWidget {
 
 class _ReportsScreenState
     extends State<ReportsScreen> {
-  String category = 'HARASSMENT';
+  @override
+  void initState() {
+    super.initState();
 
-  int severity = 3;
+    WidgetsBinding.instance
+        .addPostFrameCallback(
+      (_) {
+        context
+            .read<ReportsProvider>()
+            .loadReports();
+      },
+    );
+  }
 
-  final TextEditingController
-      descriptionController =
-      TextEditingController();
+  Color _statusColor(
+    String status,
+  ) {
+    switch (status.toUpperCase()) {
+      case 'VERIFIED':
+        return Colors.green;
+
+      case 'RESOLVED':
+        return Colors.blueGrey;
+
+      default:
+        return Colors.orange;
+    }
+  }
+
+  IconData _statusIcon(
+    String status,
+  ) {
+    switch (status.toUpperCase()) {
+      case 'VERIFIED':
+        return Icons.verified;
+
+      case 'RESOLVED':
+        return Icons.check_circle;
+
+      default:
+        return Icons.warning;
+    }
+  }
+
+  String _formatDate(
+    DateTime date,
+  ) {
+    return
+        "${date.day}/${date.month}/${date.year}";
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     final provider =
         context.watch<ReportsProvider>();
-
-    final locationProvider =
-        context.watch<LocationProvider>();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Reports',
+          'My Reports',
         ),
       ),
-
-      body: SingleChildScrollView(
-        padding:
-            const EdgeInsets.all(16),
-
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-
-          children: [
-
-            FilledButton.icon(
-              onPressed: () async {
-                await locationProvider
-                    .loadLocation();
-              },
-
-              icon: const Icon(
-                Icons.my_location,
-              ),
-
-              label: const Text(
-                'Use Current Location',
-              ),
-            ),
-
-            const SizedBox(
-              height: 16,
-            ),
-
-            Card(
-              child: Padding(
-                padding:
-                    const EdgeInsets.all(
-                        12),
-
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
-                  children: [
-
-                    const Text(
-                      'Selected Location',
-                      style: TextStyle(
-                        fontWeight:
-                            FontWeight.bold,
+      body: provider.loading
+          ? const Center(
+              child:
+                  CircularProgressIndicator(),
+            )
+          : provider.reports.isEmpty
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.report_outlined,
+                        size: 64,
+                        color: Colors.grey,
                       ),
-                    ),
-
-                    const SizedBox(
-                      height: 8,
-                    ),
-
-                    Text(
-                      'Latitude: ${locationProvider.position?.latitude ?? "Not Selected"}',
-                    ),
-
-                    Text(
-                      'Longitude: ${locationProvider.position?.longitude ?? "Not Selected"}',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            const Text(
-              'Category',
-            ),
-
-            DropdownButton<String>(
-              isExpanded: true,
-
-              value: category,
-
-              items: const [
-
-                DropdownMenuItem(
-                  value: 'HARASSMENT',
-                  child: Text(
-                    'Harassment',
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Text(
+                        'No reports submitted yet',
+                      ),
+                    ],
                   ),
-                ),
+                )
+              : RefreshIndicator(
+                  onRefresh:
+                      provider.loadReports,
+                  child: ListView.builder(
+                    padding:
+                        const EdgeInsets.all(
+                      12,
+                    ),
+                    itemCount:
+                        provider.reports.length,
+                    itemBuilder:
+                        (
+                      context,
+                      index,
+                    ) {
+                      final report =
+                          provider.reports[
+                              index];
 
-                DropdownMenuItem(
-                  value: 'THEFT',
-                  child: Text(
-                    'Theft',
-                  ),
-                ),
+                      final statusColor =
+                          _statusColor(
+                        report.status,
+                      );
 
-                DropdownMenuItem(
-                  value: 'ASSAULT',
-                  child: Text(
-                    'Assault',
-                  ),
-                ),
+                      return Card(
+                        margin:
+                            const EdgeInsets.only(
+                          bottom: 12,
+                        ),
+                        elevation: 2,
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.all(
+                            16,
+                          ),
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+                            children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor:
+                                        statusColor,
+                                    child: Icon(
+                                      _statusIcon(
+                                        report
+                                            .status,
+                                      ),
+                                      color: Colors
+                                          .white,
+                                    ),
+                                  ),
 
-                DropdownMenuItem(
-                  value: 'VANDALISM',
-                  child: Text(
-                    'Vandalism',
-                  ),
-                ),
-              ],
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
 
-              onChanged: (value) {
-                if (value == null){
-                  return;
-                }
+                                  Expanded(
+                                    child: Text(
+                                      report
+                                          .category,
+                                      style:
+                                          const TextStyle(
+                                        fontSize:
+                                            18,
+                                        fontWeight:
+                                            FontWeight
+                                                .bold,
+                                      ),
+                                    ),
+                                  ),
 
-                setState(() {
-                  category = value;
-                });
-              },
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            Text(
-              'Severity: $severity',
-            ),
-
-            Slider(
-              value:
-                  severity.toDouble(),
-
-              min: 1,
-
-              max: 5,
-
-              divisions: 4,
-
-              onChanged: (value) {
-                setState(() {
-                  severity =
-                      value.toInt();
-                });
-              },
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            TextField(
-              controller:
-                  descriptionController,
-
-              maxLines: 4,
-
-              decoration:
-                  const InputDecoration(
-                labelText:
-                    'Description',
-
-                border:
-                    OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            FilledButton(
-              onPressed:
-                  provider.loading
-                      ? null
-                      : () async {
-
-                          final latitude =
-                              locationProvider
-                                      .position
-                                      ?.latitude ??
-                                  0;
-
-                          final longitude =
-                              locationProvider
-                                      .position
-                                      ?.longitude ??
-                                  0;
-
-                          final request =
-                              ReportRequest(
-                            latitude:
-                                latitude,
-
-                            longitude:
-                                longitude,
-
-                            category:
-                                category,
-
-                            severity:
-                                severity,
-
-                            description:
-                                descriptionController
-                                    .text,
-
-                            source:
-                                'CITIZEN',
-
-                            timestamp:
-                                DateTime.now(),
-                          );
-
-                          final messenger = ScaffoldMessenger.of(context);
-                          
-                          await provider
-                              .submitReport(
-                            request,
-                          );
-
-                          if (!mounted) {
-                            return;
-                          }
-                          
-
-                          final responseMessage =
-                            provider.response?.message ??
-                            'Submitted';
-
-                          messenger.showSnackBar(
-
-                            SnackBar(
-                              content: Text(
-                                responseMessage,
+                                  Container(
+                                    padding:
+                                        const EdgeInsets.symmetric(
+                                      horizontal:
+                                          10,
+                                      vertical:
+                                          6,
+                                    ),
+                                    decoration:
+                                        BoxDecoration(
+                                      color:
+                                          statusColor
+                                              .withOpacity(
+                                        0.15,
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                        20,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      report
+                                          .status,
+                                      style:
+                                          TextStyle(
+                                        color:
+                                            statusColor,
+                                        fontWeight:
+                                            FontWeight
+                                                .bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          );
-                        },
 
-              child: Text(
-                provider.loading
-                    ? 'Submitting...'
-                    : 'Submit Report',
-              ),
-            ),
+                              const SizedBox(
+                                height: 16,
+                              ),
 
-            const SizedBox(
-              height: 20,
-            ),
+                              Text(
+                                report
+                                    .description,
+                              ),
 
-            if (provider.response !=
-                null)
+                              const SizedBox(
+                                height: 12,
+                              ),
 
-              Card(
-                child: Padding(
-                  padding:
-                      const EdgeInsets
-                          .all(12),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color:
+                                        Colors.grey,
+                                  ),
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  Text(
+                                    'Region ${report.regionId}',
+                                    style:
+                                        const TextStyle(
+                                      color: Colors
+                                          .grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
 
-                  child: Text(
-                    'Report ID: ${provider.response!.id}',
+                              const SizedBox(
+                                height: 8,
+                              ),
+
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.speed,
+                                    size: 16,
+                                    color:
+                                        Colors.grey,
+                                  ),
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  Text(
+                                    'Severity ${report.severity}',
+                                    style:
+                                        const TextStyle(
+                                      color: Colors
+                                          .grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(
+                                height: 8,
+                              ),
+
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_today,
+                                    size: 16,
+                                    color:
+                                        Colors.grey,
+                                  ),
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  Text(
+                                    _formatDate(
+                                      report
+                                          .timestamp,
+                                    ),
+                                    style:
+                                        const TextStyle(
+                                      color: Colors
+                                          .grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(
+                                height: 16,
+                              ),
+
+                              if (report.status !=
+                                  'RESOLVED')
+                                SizedBox(
+                                  width:
+                                      double.infinity,
+                                  child:
+                                      FilledButton.icon(
+                                    icon:
+                                        const Icon(
+                                      Icons
+                                          .check,
+                                    ),
+                                    label:
+                                        const Text(
+                                      'Mark Resolved',
+                                    ),
+                                    onPressed:
+                                        () async {
+                                      await provider
+                                          .closeReport(
+                                        report.id,
+                                      );
+
+                                      if (!mounted) {
+                                        return;
+                                      }
+
+                                      ScaffoldMessenger.of(
+                                              context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text(
+                                            'Report resolved',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )
+                              else
+                                const Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons
+                                          .check_circle,
+                                      color:
+                                          Colors.green,
+                                    ),
+                                    SizedBox(
+                                      width: 8,
+                                    ),
+                                    Text(
+                                      'Resolved',
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-          ],
-        ),
-      ),
     );
   }
 }

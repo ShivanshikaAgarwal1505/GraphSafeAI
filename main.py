@@ -19,6 +19,10 @@ from services.navigation_engine.api.routes import (
     router as navigation_router
 )
 
+from services.authentication.api.routes import (
+    router as auth_router,
+)
+
 import logging
 
 logging.basicConfig(
@@ -76,6 +80,9 @@ app.include_router(
     navigation_router
 )
 
+app.include_router(
+    auth_router,
+)
 # ----------------------------
 # Health
 # ----------------------------

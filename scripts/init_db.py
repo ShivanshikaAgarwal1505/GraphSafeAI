@@ -16,6 +16,15 @@ from shared.database.models.prediction import (
     Prediction
 )
 
+from shared.database.models.user import User
+
+from shared.database.models.favorite_location import (
+    FavoriteLocation
+)
+
+from shared.database.models.report_vote import (
+    ReportVote
+)
 
 def create_tables():
 

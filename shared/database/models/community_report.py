@@ -29,6 +29,12 @@ class CommunityReport(Base):
         nullable=False
     )
 
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True,
+    )
+    
     latitude = Column(
         Float,
         nullable=False
@@ -58,6 +64,18 @@ class CommunityReport(Base):
         String(50),
         nullable=False,
         default="OPEN"
+    )
+
+    confidence_score = Column(
+        Float,
+        nullable=False,
+        default=0.0,
+    )
+
+    verification_count = Column(
+        Integer,
+        nullable=False,
+        default=0,
     )
 
     source = Column(

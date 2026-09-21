@@ -1,3 +1,4 @@
+from shared.database import current_user
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -19,6 +20,14 @@ from services.community_reporting.application.category_service import (
     CategoryService
 )
 
+from shared.database.current_user import (
+    get_current_user,
+)
+
+from shared.database.models.user import (
+    User,
+)
+
 router = APIRouter()
 
 service = ReportService()
@@ -29,19 +38,21 @@ category_service = CategoryService()
 @router.post("/")
 def create_report(
     report: CommunityReportCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user,
+    ),
 ):
 
-    saved_report = (
-        service.create_report(
-            db=db,
-            report_data=report
-        )
+    saved_report = service.create_report(
+        db=db,
+        report_data=report,
+        user_id=current_user.id,
     )
 
     return {
         "id": saved_report.id,
-        "message": "Report saved successfully"
+        "message": "Report saved successfully",
     }
 
 
@@ -67,7 +78,18 @@ def get_reports(
         source=source
     )
 
-
+@router.get("/my")
+def my_reports(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user,
+    ),
+):
+    return service.get_my_reports(
+        db=db,
+        user_id=current_user.id,
+    )
+    
 @router.get(
     "/{report_id}",
     response_model=CommunityReportResponse
@@ -177,8 +199,7 @@ def get_category_stats(
     return category_service.get_category_stats(
         db
     )
-
-
+    
 @router.get(
     "/regions/{region_id}"
 )
@@ -198,3 +219,29 @@ def health():
     return {
         "status": "healthy"
     }
+
+@router.patch("/{report_id}/close")
+def close_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user,
+    ),
+):
+    try:
+        report = service.close_report(
+            db=db,
+            report_id=report_id,
+            user_id=current_user.id,
+        )
+
+        return {
+            "id": report.id,
+            "status": report.status,
+        }
+
+    except PermissionError as exc:
+        raise HTTPException(
+            status_code=403,
+            detail=str(exc),
+        )

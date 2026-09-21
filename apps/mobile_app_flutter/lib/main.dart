@@ -5,6 +5,8 @@ import 'app/app.dart';
 import 'features/navigation/providers/navigation_provider.dart';
 import 'features/reports/providers/reports_provider.dart';
 import 'features/location/providers/location_provider.dart';
+import 'features/search/providers/search_provider.dart';
+import 'features/auth/providers/auth_provider.dart';
 
 void main() {
   runApp(
@@ -21,7 +23,15 @@ void main() {
         ChangeNotifierProvider(
           create: (_) => LocationProvider(),
         ),
+        
+        ChangeNotifierProvider(
+          create: (_) => SearchProvider(),
+        ),
 
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider()
+          ..initialize(),
+        ),
       ],
       child: const GraphSafeAIApp(),
     ),

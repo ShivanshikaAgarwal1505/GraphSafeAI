@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../features/navigation/screens/home_screen.dart';
 import '../features/reports/screens/reports_screen.dart';
+import '../features/profile/screens/profile_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({
@@ -24,13 +25,7 @@ class _MainNavigationState
 
     HomeScreen(),
 
-    Placeholder(
-      child: Center(
-        child: Text(
-          'Profile (Coming Soon)',
-        ),
-      ),
-    ),
+    ProfileScreen(),
   ];
 
   @override

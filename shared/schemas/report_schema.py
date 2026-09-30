@@ -31,6 +31,8 @@ class CommunityReportResponse(
     user_id: int | None
     
     region_id: int
+    
+    region_name: str | None = None
 
     latitude: float
 

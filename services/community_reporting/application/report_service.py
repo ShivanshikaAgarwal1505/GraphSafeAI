@@ -124,6 +124,15 @@ class ReportService:
                 "Report not found."
             )
 
+        report.region_name = (
+        db.query(Region)
+        .filter(
+        Region.id == report.region_id
+        )
+        .first()
+        .region_name
+        )
+
         return report
 
     def get_reports(
@@ -193,12 +202,17 @@ class ReportService:
         source=None
     ):
 
-        return repository.get_filtered(
+        reports = repository.get_filtered(
             db=db,
             status=status,
             category=category,
             region_id=region_id,
             source=source
+        )
+        
+        return self.enrich_report_region_names(
+            db,
+            reports,
         )
 
     def get_region_stats(
@@ -271,7 +285,7 @@ class ReportService:
     db,
     user_id: int,
     ):
-        return (
+        reports = (
         db.query(
             CommunityReport
         )
@@ -282,6 +296,11 @@ class ReportService:
             CommunityReport.timestamp.desc()
         )
         .all()
+        )
+        
+        return self.enrich_report_region_names(
+            db,
+            reports,
         )
         
     def close_report(
@@ -338,3 +357,27 @@ class ReportService:
                 report.status = "VERIFIED"
 
             db.commit()
+            
+    def enrich_report_region_names(
+    self,
+    db: Session,
+    reports,
+    ):
+        region_map = {
+        region.id: region.region_name
+        for region in db.query(Region).all()
+        }
+
+        result = []
+
+        for report in reports:
+
+            report.region_name = (
+            region_map.get(
+                report.region_id
+            )
+            )
+
+        result.append(report)
+
+        return result

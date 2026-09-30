@@ -13,8 +13,7 @@ class Region(Base):
 
     region_name = Column(
         String(100),
-        nullable=False,
-        unique=True
+        nullable=False
     )
 
     centroid_lat = Column(

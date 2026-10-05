@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../constants/api_constants.dart';
-
+ 
 class ApiClient {
   static final FlutterSecureStorage _storage =
       const FlutterSecureStorage();

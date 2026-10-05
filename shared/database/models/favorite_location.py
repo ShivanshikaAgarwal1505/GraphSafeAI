@@ -7,7 +7,7 @@ from sqlalchemy import (
     String,
     DateTime,
     ForeignKey,
-)
+) 
 
 from shared.database.models.base import Base
 

@@ -188,10 +188,8 @@ class _ReportsScreenState
                                     ),
                                     decoration:
                                         BoxDecoration(
-                                      color:
-                                          statusColor
-                                              .withOpacity(
-                                        0.15,
+                                      color: statusColor.withValues(
+                                        alpha: 0.15,
                                       ),
                                       borderRadius:
                                           BorderRadius.circular(
@@ -324,10 +322,11 @@ class _ReportsScreenState
                                         const Text(
                                       'Mark Resolved',
                                     ),
-                                    onPressed:
-                                        () async {
-                                      await provider
-                                          .closeReport(
+                                    onPressed: () async {
+                                      final messenger =
+                                          ScaffoldMessenger.of(context);
+
+                                      await provider.closeReport(
                                         report.id,
                                       );
 
@@ -335,12 +334,9 @@ class _ReportsScreenState
                                         return;
                                       }
 
-                                      ScaffoldMessenger.of(
-                                              context)
-                                          .showSnackBar(
+                                      messenger.showSnackBar(
                                         const SnackBar(
-                                          content:
-                                              Text(
+                                          content: Text(
                                             'Report resolved',
                                           ),
                                         ),

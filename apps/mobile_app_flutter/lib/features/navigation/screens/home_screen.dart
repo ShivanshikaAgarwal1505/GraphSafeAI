@@ -24,6 +24,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final searching =
+    SearchPanel.panelKey.currentState
+            ?.isOpen ??
+        false;
+
   @override
   void initState() {
     super.initState();
@@ -90,12 +95,15 @@ class _HomeScreenState extends State<HomeScreen> {
               child: TravelModeFab(),
             ),
 
-            if (provider.activeRoute != null)
-              Positioned(
-                top: 150,
-                right: 12,
-                child: const RouteSelectorChips(),
-              ),
+            if (
+              provider.activeRoute != null &&
+              !searching
+            )
+            Positioned(
+              top: 150,
+              right: 12,
+              child: const RouteSelectorChips(),
+            ),
 
             Positioned(
               left: 20,

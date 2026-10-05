@@ -4,7 +4,7 @@ import '../models/route_response.dart';
 import '../models/travel_mode.dart';
 import '../models/route_preference.dart';
 import '../services/navigation_service.dart';
-
+ 
 class NavigationProvider extends ChangeNotifier {
   final NavigationService _service =
       NavigationService();

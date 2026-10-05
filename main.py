@@ -23,6 +23,10 @@ from services.authentication.api.routes import (
     router as auth_router,
 )
 
+from services.favorites.api.routes import (
+    router as favorites_router,
+)
+
 import logging
 
 logging.basicConfig(
@@ -83,6 +87,10 @@ app.include_router(
 app.include_router(
     auth_router,
 )
+
+app.include_router(
+    favorites_router,
+)
 # ----------------------------
 # Health
 # ----------------------------
@@ -91,4 +99,4 @@ app.include_router(
 async def root():
     return {
         "message": "GraphSafeAI API Running"
-    }
+    } 

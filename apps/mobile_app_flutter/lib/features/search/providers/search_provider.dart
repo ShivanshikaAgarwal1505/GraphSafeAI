@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../models/search_location.dart';
 import '../services/search_service.dart';
+import '../services/favorite_service.dart';
 
 class SearchProvider
     extends ChangeNotifier {
   final SearchService _service =
       SearchService();
+  
+  final FavoriteService
+    _favoriteService =
+        FavoriteService();
 
   SearchLocation? selectedSource;
 
@@ -23,12 +28,25 @@ class SearchProvider
   List<SearchLocation> filteredResults =
       [];
 
+  bool isFavorite(
+    SearchLocation location,
+  ) {
+    return favoritePlaces.any(
+      (f) =>
+          f.name == location.name,
+    );
+  }
+
   Future<void> initialize() async {
     popularPlaces =
         await _service.loadPopularPlaces();
 
     recentSearches =
         await _service.getRecentSearches();
+
+    favoritePlaces =
+    await _favoriteService
+        .loadFavorites();
 
     notifyListeners();
   }
@@ -52,7 +70,10 @@ class SearchProvider
 
     notifyListeners();
   }
-  void search(String query) {
+
+  Future<void> search(
+    String query,
+  ) async {
     if (query.trim().isEmpty) {
       filteredResults = [];
       notifyListeners();
@@ -60,13 +81,10 @@ class SearchProvider
     }
 
     filteredResults =
-        popularPlaces.where((place) {
-      return place.name
-          .toLowerCase()
-          .contains(
-            query.toLowerCase(),
-          );
-    }).toList();
+        await _service
+            .searchLocations(
+      query,
+    );
 
     notifyListeners();
   }
@@ -94,6 +112,57 @@ class SearchProvider
 
   void clearDestination() {
     selectedDestination = null;
+
+    notifyListeners();
+  }
+
+  Future<void> addFavorite(
+    SearchLocation location,
+  ) async {
+
+    await _favoriteService.addFavorite(
+      label: location.name,
+      latitude: location.latitude,
+      longitude: location.longitude,
+    );
+
+    favoritePlaces =
+        await _favoriteService
+            .loadFavorites();
+
+    notifyListeners();
+  }
+
+  Future<void> toggleFavorite(
+    SearchLocation location,
+  ) async {
+
+    if (
+        isFavorite(
+          location,
+        )) {
+
+      await _favoriteService
+          .removeFavorite(
+        location.name,
+      );
+
+    } else {
+
+      await _favoriteService
+          .addFavorite(
+        label:
+            location.name,
+        latitude:
+            location.latitude,
+        longitude:
+            location.longitude,
+      );
+    }
+
+    favoritePlaces =
+        await _favoriteService
+            .loadFavorites();
 
     notifyListeners();
   }

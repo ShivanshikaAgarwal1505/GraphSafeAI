@@ -6,7 +6,7 @@ from shared.database.session import get_db
 
 from services.navigation_engine.application.nearest_node_service import (
     NearestNodeService
-)
+) 
 
 from services.navigation_engine.application.navigation_service import (
     NavigationService
@@ -15,6 +15,7 @@ from services.navigation_engine.application.navigation_service import (
 from shared.config.navigation_profiles import (
     NAVIGATION_PROFILES
 )
+from shared.database.models.region import Region
 
 router = APIRouter(
     prefix="/api/v1/navigation",
@@ -59,6 +60,31 @@ def route(
             profile=profile
         )
     )
+    
+@router.get("/search")
+def search_locations(
+    q: str,
+    db: Session = Depends(get_db),
+):
+    results = (
+        db.query(Region)
+        .filter(
+            Region.region_name.ilike(
+                f"%{q}%"
+            )
+        )
+        .limit(20)
+        .all()
+    )
+
+    return [
+        {
+            "name": region.region_name,
+            "latitude": region.centroid_lat,
+            "longitude": region.centroid_lon,
+        }
+        for region in results
+    ]
     
 @router.get("/profiles")
 def profiles():

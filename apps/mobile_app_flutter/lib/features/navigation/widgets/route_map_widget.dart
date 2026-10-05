@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../models/route_response.dart';
 import '../models/route_preference.dart';
 
-class RouteMapWidget extends StatelessWidget {
+class RouteMapWidget extends StatefulWidget {
   final RouteResponse? safeRoute;
   final RouteResponse? balancedRoute;
   final RouteResponse? fastestRoute;
@@ -27,9 +26,118 @@ class RouteMapWidget extends StatelessWidget {
   });
 
   @override
+  State<RouteMapWidget> createState() =>
+      _RouteMapWidgetState();
+}
+
+class _RouteMapWidgetState
+    extends State<RouteMapWidget> {
+  final MapController mapController =
+      MapController();
+
+  void _fitRoute(
+    List<LatLng> points,
+  ) {
+    if (points.isEmpty) {
+      return;
+    }
+
+    double minLat =
+        points.first.latitude;
+
+    double maxLat =
+        points.first.latitude;
+
+    double minLon =
+        points.first.longitude;
+
+    double maxLon =
+        points.first.longitude;
+
+    for (final point in points) {
+      if (point.latitude < minLat) {
+        minLat = point.latitude;
+      }
+
+      if (point.latitude > maxLat) {
+        maxLat = point.latitude;
+      }
+
+      if (point.longitude < minLon) {
+        minLon = point.longitude;
+      }
+
+      if (point.longitude > maxLon) {
+        maxLon = point.longitude;
+      }
+    }
+
+    mapController.fitCamera(
+      CameraFit.bounds(
+        bounds: LatLngBounds(
+          LatLng(minLat, minLon),
+          LatLng(maxLat, maxLon),
+        ),
+        padding:
+            const EdgeInsets.all(60),
+      ),
+    );
+  }
+
+  @override
+  void didUpdateWidget(
+    covariant RouteMapWidget oldWidget,
+  ) {
+    super.didUpdateWidget(oldWidget);
+
+    RouteResponse? route;
+
+    switch (
+        widget.selectedRoute) {
+      case RoutePreference.safe:
+        route = widget.safeRoute;
+        break;
+
+      case RoutePreference.balanced:
+        route =
+            widget.balancedRoute;
+        break;
+
+      case RoutePreference.fastest:
+        route =
+            widget.fastestRoute;
+        break;
+    }
+
+    if (route == null ||
+        route.routeCoordinates
+            .isEmpty) {
+      return;
+    }
+
+    final points =
+        route.routeCoordinates
+            .map(
+              (e) => LatLng(
+                e.latitude,
+                e.longitude,
+              ),
+            )
+            .toList();
+
+    WidgetsBinding.instance
+        .addPostFrameCallback(
+      (_) {
+        _fitRoute(points);
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final safePoints =
-        safeRoute?.routeCoordinates
+        widget.safeRoute
+                ?.routeCoordinates
                 .map(
                   (e) => LatLng(
                     e.latitude,
@@ -40,7 +148,8 @@ class RouteMapWidget extends StatelessWidget {
             [];
 
     final balancedPoints =
-        balancedRoute?.routeCoordinates
+        widget.balancedRoute
+                ?.routeCoordinates
                 .map(
                   (e) => LatLng(
                     e.latitude,
@@ -51,7 +160,8 @@ class RouteMapWidget extends StatelessWidget {
             [];
 
     final fastestPoints =
-        fastestRoute?.routeCoordinates
+        widget.fastestRoute
+                ?.routeCoordinates
                 .map(
                   (e) => LatLng(
                     e.latitude,
@@ -62,10 +172,12 @@ class RouteMapWidget extends StatelessWidget {
             [];
 
     return FlutterMap(
+      mapController:
+          mapController,
       options: MapOptions(
         initialCenter: LatLng(
-          centerLat,
-          centerLon,
+          widget.centerLat,
+          widget.centerLon,
         ),
         initialZoom: 14,
       ),
@@ -83,60 +195,73 @@ class RouteMapWidget extends StatelessWidget {
               Polyline(
                 points: safePoints,
                 strokeWidth:
-                    selectedRoute ==
+                    widget.selectedRoute ==
                             RoutePreference.safe
                         ? 8
                         : 4,
                 color:
-                    const Color.fromARGB(255, 49, 116, 53)
-                        .withValues(
-                      alpha:
-                        selectedRoute ==
-                          RoutePreference.safe
-                      ? 1
-                      : 0.30,
+                    const Color.fromARGB(
+                      255,
+                      49,
+                      116,
+                      53,
+                    ).withValues(
+                  alpha:
+                      widget.selectedRoute ==
+                              RoutePreference.safe
+                          ? 1
+                          : 0.30,
                 ),
               ),
 
-            if (balancedPoints.isNotEmpty)
+            if (balancedPoints
+                .isNotEmpty)
               Polyline(
-                points: balancedPoints,
+                points:
+                    balancedPoints,
                 strokeWidth:
-                    selectedRoute ==
+                    widget.selectedRoute ==
                             RoutePreference
                                 .balanced
                         ? 8
                         : 4,
                 color:
-                    const Color.fromARGB(255, 250, 184, 1)
-                        .withValues(
-                      alpha:
-                        selectedRoute ==
-                          RoutePreference
-                              .balanced
-                      ? 1
-                      : 0.30,
+                    const Color.fromARGB(
+                      255,
+                      250,
+                      184,
+                      1,
+                    ).withValues(
+                  alpha:
+                      widget.selectedRoute ==
+                              RoutePreference
+                                  .balanced
+                          ? 1
+                          : 0.30,
                 ),
               ),
 
-            if (fastestPoints.isNotEmpty)
+            if (fastestPoints
+                .isNotEmpty)
               Polyline(
-                points: fastestPoints,
+                points:
+                    fastestPoints,
                 strokeWidth:
-                    selectedRoute ==
+                    widget.selectedRoute ==
                             RoutePreference
                                 .fastest
                         ? 8
                         : 4,
                 color:
-                    const Color(0xFF1565C0)
-                        .withValues(
-                      alpha:
-                        selectedRoute ==
-                          RoutePreference
-                              .fastest
-                      ? 1
-                      : 0.30,
+                    const Color(
+                      0xFF1565C0,
+                    ).withValues(
+                  alpha:
+                      widget.selectedRoute ==
+                              RoutePreference
+                                  .fastest
+                          ? 1
+                          : 0.30,
                 ),
               ),
           ],
@@ -146,8 +271,8 @@ class RouteMapWidget extends StatelessWidget {
           markers: [
             Marker(
               point: LatLng(
-                centerLat,
-                centerLon,
+                widget.centerLat,
+                widget.centerLon,
               ),
               width: 40,
               height: 40,

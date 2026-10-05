@@ -17,6 +17,8 @@ class SearchPanel extends StatefulWidget {
   static final GlobalKey<_SearchPanelState> panelKey =
       GlobalKey<_SearchPanelState>();
 
+  
+
   @override
   State<SearchPanel> createState() => _SearchPanelState();
 }
@@ -25,11 +27,23 @@ class _SearchPanelState extends State<SearchPanel> {
   final TextEditingController destinationController =
       TextEditingController();
 
+  final TextEditingController
+    searchController =
+        TextEditingController();
+
   SearchMode mode = SearchMode.none;
+
+  bool get isOpen =>
+    mode != SearchMode.none;
+
+  bool get isSearching =>
+    searchController.text.trim().isNotEmpty;
+
 
   @override
   void dispose() {
     destinationController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
@@ -118,7 +132,7 @@ class _SearchPanelState extends State<SearchPanel> {
                       SearchMode.destination;
                 });
               },
-              child: const Padding(
+              child: Padding(
                 padding:
                     EdgeInsets.all(16),
                 child: Row(
@@ -126,9 +140,22 @@ class _SearchPanelState extends State<SearchPanel> {
                     Icon(Icons.search),
                     SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        'Where are you going?',
-                      ),
+                      child: mode == SearchMode.destination
+                          ? TextField(
+                              controller: searchController,
+                              autofocus: true,
+                              decoration: const InputDecoration(
+                                hintText: 'Search destination',
+                                border: InputBorder.none,
+                              ),
+                              onChanged: (value) {
+                                provider.search(value);
+                                setState(() {});
+                              },
+                            )
+                          : const Text(
+                              'Where are you going?',
+                            ),
                     ),
                   ],
                 ),
@@ -162,11 +189,23 @@ class _SearchPanelState extends State<SearchPanel> {
                           width: 12,
                         ),
                         Expanded(
-                          child: Text(
-                            provider.selectedSource
-                                    ?.name ??
-                                'Current Location',
-                          ),
+                          child: mode == SearchMode.source
+                              ? TextField(
+                                  controller: searchController,
+                                  autofocus: true,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Search source',
+                                    border: InputBorder.none,
+                                  ),
+                                  onChanged: (value) {
+                                    provider.search(value);
+                                    setState(() {});
+                                  },
+                                )
+                              : Text(
+                                  provider.selectedSource?.name ??
+                                      'Current Location',
+                                ),
                         ),
                       ],
                     ),
@@ -219,65 +258,69 @@ class _SearchPanelState extends State<SearchPanel> {
               height: 280,
               child: ListView(
                 children: [
-                  const _SectionHeader(
-                    title: 'Favorites',
-                  ),
-
-                  if (provider
-                      .favoritePlaces
-                      .isEmpty)
-                    const ListTile(
-                      title: Text(
-                        'No favorites yet',
+                  if (isSearching) ...[
+                    if (provider.filteredResults.isNotEmpty) ...[
+                      const _SectionHeader(
+                        title: 'Results',
                       ),
-                    ),
 
-                  ...provider.favoritePlaces.map(
-                    (e) => _locationTile(
-                      context,
-                      provider,
-                      e,
-                      Icons.star,
-                    ),
-                  ),
+                      ...provider.filteredResults.map(
+                        (e) => _locationTile(
+                          context,
+                          provider,
+                          e,
+                          Icons.place,
+                        ),
+                      ),
+                    ],
 
-                  if (provider
-                      .recentSearches
-                      .isNotEmpty) ...[
+                    if (provider.filteredResults.isEmpty)
+                      const ListTile(
+                        title: Text(
+                          'No matching locations',
+                        ),
+                      ),
+                  ] else ...[
                     const _SectionHeader(
-                      title:
-                          'Recent Searches',
+                      title: 'Favorites',
                     ),
-                    ...provider.recentSearches.map(
+
+                    if (provider.favoritePlaces.isEmpty)
+                      const ListTile(
+                        title: Text(
+                          'No favorites yet',
+                        ),
+                      ),
+
+                    ...provider.favoritePlaces.map(
                       (e) => _locationTile(
                         context,
                         provider,
                         e,
-                        Icons.history,
+                        Icons.star,
                       ),
                     ),
-                  ],
 
-                  const _SectionHeader(
-                    title: 'Popular Places',
-                  ),
+                    if (provider.recentSearches.isNotEmpty) ...[
+                      const _SectionHeader(
+                        title: 'Recent Searches',
+                      ),
 
-                  ...provider.popularPlaces.map(
-                    (e) => _locationTile(
-                      context,
-                      provider,
-                      e,
-                      Icons.place,
-                    ),
-                  ),
+                      ...provider.recentSearches.map(
+                        (e) => _locationTile(
+                          context,
+                          provider,
+                          e,
+                          Icons.history,
+                        ),
+                      ),
+                    ],
 
-                  if (provider
-                      .filteredResults
-                      .isNotEmpty) ...[
                     const _SectionHeader(
-                      title: 'Results',
+                      title: 'Popular Places',
                     ),
-                    ...provider.filteredResults.map(
+
+                    ...provider.popularPlaces.map(
                       (e) => _locationTile(
                         context,
                         provider,
@@ -301,8 +344,27 @@ class _SearchPanelState extends State<SearchPanel> {
     IconData icon,
   ) {
     return ListTile(
-      leading: Icon(icon),
-      title: Text(location.name),
+      leading: IconButton(
+        icon: Icon(
+          provider.isFavorite(location)
+              ? Icons.star
+              : Icons.star_border,
+          color:
+              provider.isFavorite(location)
+                  ? Colors.amber
+                  : null,
+        ),
+        onPressed: () async {
+          await provider.toggleFavorite(
+            location,
+          );
+        },
+      ),
+
+      title: Text(
+        location.name,
+      ),
+
       onTap: () async {
         debugPrint(  
           'LOCATION TILE TAPPED: ${location.name}',
@@ -329,6 +391,8 @@ class _SearchPanelState extends State<SearchPanel> {
           context,
           provider,
         );
+
+        searchController.clear();
 
         if (!mounted) return;
 

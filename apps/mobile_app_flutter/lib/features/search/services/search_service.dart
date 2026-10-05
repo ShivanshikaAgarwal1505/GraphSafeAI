@@ -5,10 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/search_location.dart';
 
+import '../../../core/network/api_client.dart';
+
 class SearchService {
   static const String recentSearchesKey =
       'recent_searches';
-
+ 
   Future<List<SearchLocation>>
       loadPopularPlaces() async {
     final raw =
@@ -81,5 +83,28 @@ class SearchService {
       recentSearchesKey,
       existing.take(10).toList(),
     );
+  }
+
+  Future<List<SearchLocation>>
+      searchLocations(
+    String query,
+  ) async {
+    final response =
+        await ApiClient.dio.get(
+      '/api/v1/navigation/search',
+      queryParameters: {
+        'q': query,
+      },
+    );
+
+    final List data =
+        response.data;
+
+    return data
+        .map(
+          (e) =>
+              SearchLocation.fromJson(e),
+        )
+        .toList();
   }
 }

@@ -24,11 +24,18 @@ from shared.schemas.favorite_schema import (
     FavoriteResponse,
 )
 
+from fastapi import HTTPException
+from pydantic import BaseModel
+
 router = APIRouter(
     prefix="/api/v1/favorites",
     tags=["Favorites"],
 )
 
+class FavoriteUpdateRequest(
+    BaseModel,
+):
+    label: str
 
 @router.get(
     "",
@@ -109,3 +116,79 @@ def delete_favorite(
     return {
         "success": True,
     }
+    
+@router.put(
+    "/{favorite_id}",
+    response_model=FavoriteResponse,
+)
+def update_favorite(
+    favorite_id: int,
+    request: FavoriteUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user,
+    ),
+):
+    favorite = (
+        db.query(
+            FavoriteLocation,
+        )
+        .filter(
+            FavoriteLocation.id
+            == favorite_id,
+            FavoriteLocation.user_id
+            == current_user.id,
+        )
+        .first()
+    )
+
+    if favorite is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Favorite not found",
+        )
+
+    favorite.label = request.label
+
+    db.commit()
+
+    db.refresh(favorite)
+
+    return favorite@router.put(
+    "/{favorite_id}",
+    response_model=FavoriteResponse,
+)
+def update_favorite(
+    favorite_id: int,
+    request: FavoriteUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user,
+    ),
+):
+    favorite = (
+        db.query(
+            FavoriteLocation,
+        )
+        .filter(
+            FavoriteLocation.id
+            == favorite_id,
+            FavoriteLocation.user_id
+            == current_user.id,
+        )
+        .first()
+    )
+
+    if favorite is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Favorite not found",
+        )
+
+    favorite.label = request.label
+
+    db.commit()
+
+    db.refresh(favorite)
+
+    return favorite

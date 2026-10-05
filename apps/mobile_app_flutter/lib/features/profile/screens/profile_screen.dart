@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../auth/screens/register_screen.dart';
+import 'favorites_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({
@@ -174,14 +175,31 @@ class ProfileScreen extends StatelessWidget {
               Card(
                 child: ListTile(
                   leading: const Icon(
-                    Icons.favorite_border,
+                    Icons.star,
+                    color: Colors.amber,
                   ),
+
                   title: const Text(
                     'Favorites',
                   ),
+
                   subtitle: const Text(
-                    'Coming Soon',
+                    'Manage favorite locations',
                   ),
+
+                  trailing: const Icon(
+                    Icons.chevron_right,
+                  ),
+
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const FavoritesScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
 

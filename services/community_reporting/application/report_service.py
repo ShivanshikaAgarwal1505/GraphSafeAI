@@ -378,6 +378,6 @@ class ReportService:
             )
             )
 
-        result.append(report)
+            result.append(report)
 
         return result

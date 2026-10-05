@@ -10,7 +10,7 @@ class QuickReportSheet extends StatefulWidget {
   const QuickReportSheet({
     super.key,
   });
-
+ 
   @override
   State<QuickReportSheet> createState() =>
       _QuickReportSheetState();
@@ -19,6 +19,7 @@ class QuickReportSheet extends StatefulWidget {
 class _QuickReportSheetState
     extends State<QuickReportSheet> {
   bool loading = false;
+  int selectedSeverity = 3;
 
   Future<void> submitReport(
     String category,
@@ -56,7 +57,7 @@ class _QuickReportSheetState
           longitude:
               position.longitude,
           category: category,
-          severity: 3,
+          severity: selectedSeverity,
           description: category,
           source: "USER",
           timestamp:
@@ -118,7 +119,17 @@ class _QuickReportSheetState
                   category,
                 ),
         icon: Icon(icon),
-        label: Text(title),
+        label: loading
+          ? const SizedBox(
+              height: 18,
+              width: 18,
+              child:
+                  CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Text(title),
       ),
     );
   }
@@ -180,6 +191,63 @@ class _QuickReportSheetState
               ),
             ),
 
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Severity',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+
+            const SizedBox(
+              height: 12,
+            ),
+
+            Wrap(
+              spacing: 8,
+              children: [
+                ChoiceChip(
+                  label: const Text('L'),
+                  selected: selectedSeverity == 1,
+                  onSelected: (_) {
+                    setState(() {
+                      selectedSeverity = 1;
+                    });
+                  },
+                ),
+                ChoiceChip(
+                  label: const Text('M'),
+                  selected: selectedSeverity == 2,
+                  onSelected: (_) {
+                    setState(() {
+                      selectedSeverity = 2;
+                    });
+                  },
+                ),
+                ChoiceChip(
+                  label: const Text('H'),
+                  selected: selectedSeverity == 3,
+                  onSelected: (_) {
+                    setState(() {
+                      selectedSeverity = 3;
+                    });
+                  },
+                ),
+                ChoiceChip(
+                  label: const Text('C'),
+                  selected: selectedSeverity == 4,
+                  onSelected: (_) {
+                    setState(() {
+                      selectedSeverity = 4;
+                    });
+                  },
+                ),
+              ],
+            ),
+
             const SizedBox(
               height: 24,
             ),
@@ -235,12 +303,7 @@ class _QuickReportSheetState
                   Colors.blueGrey,
             ),
 
-            if (loading) ...[
-              const SizedBox(
-                height: 24,
-              ),
-              const CircularProgressIndicator(),
-            ],
+           
           ],
         ),
       ),

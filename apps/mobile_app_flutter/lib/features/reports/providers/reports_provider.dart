@@ -8,9 +8,15 @@ class ReportsProvider
   final ReportService _service =
       ReportService();
 
-  bool loading = false;
+  bool loading = false; 
 
   List<CommunityReport> reports = [];
+
+  List<CommunityReport>
+    allReports = [];
+
+  String selectedFilter =
+      'ALL';
 
   Future<void> loadReports()
       async {
@@ -19,8 +25,15 @@ class ReportsProvider
 
       notifyListeners();
 
-      reports =
-          await _service.getMyReports();
+      allReports =
+        await _service.getMyReports();
+
+    selectedFilter = 'ALL';
+
+    applyFilter(
+      selectedFilter,
+    );
+    
     } finally {
       loading = false;
 
@@ -36,5 +49,30 @@ class ReportsProvider
     );
 
     await loadReports();
+  }
+
+  void applyFilter(
+    String filter,
+  ) {
+    selectedFilter = filter;
+
+    if (filter == 'ALL') {
+      reports =
+          List.from(
+        allReports,
+      );
+    } else {
+      reports =
+          allReports
+              .where(
+                (report) =>
+                    report.status
+                        .toUpperCase() ==
+                    filter,
+              )
+              .toList();
+    }
+
+    notifyListeners();
   }
 }

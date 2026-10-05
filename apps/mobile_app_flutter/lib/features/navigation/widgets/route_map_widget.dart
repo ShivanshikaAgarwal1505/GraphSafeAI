@@ -171,6 +171,15 @@ class _RouteMapWidgetState
                 .toList() ??
             [];
 
+    final activePoints =
+    widget.selectedRoute ==
+            RoutePreference.safe
+        ? safePoints
+        : widget.selectedRoute ==
+                RoutePreference.fastest
+            ? fastestPoints
+            : balancedPoints;
+
     return FlutterMap(
       mapController:
           mapController,
@@ -267,21 +276,48 @@ class _RouteMapWidgetState
           ],
         ),
 
+        // MarkerLayer(
+        //   markers: [
+        //     Marker(
+        //       point: LatLng(
+        //         widget.centerLat,
+        //         widget.centerLon,
+        //       ),
+        //       width: 40,
+        //       height: 40,
+        //       child: const Icon(
+        //         Icons.my_location,
+        //         color: Colors.blue,
+        //         size: 32,
+        //       ),
+        //     ),
+        //   ],
+        // ),
         MarkerLayer(
           markers: [
-            Marker(
-              point: LatLng(
-                widget.centerLat,
-                widget.centerLon,
+            if (activePoints.isNotEmpty)
+              Marker(
+                point: activePoints.first,
+                width: 40,
+                height: 40,
+                child: const Icon(
+                  Icons.location_pin,
+                  color: Colors.green,
+                  size: 40,
+                ),
               ),
-              width: 40,
-              height: 40,
-              child: const Icon(
-                Icons.my_location,
-                color: Colors.blue,
-                size: 32,
+
+            if (activePoints.isNotEmpty)
+              Marker(
+                point: activePoints.last,
+                width: 40,
+                height: 40,
+                child: const Icon(
+                  Icons.location_pin,
+                  color: Colors.red,
+                  size: 40,
+                ),
               ),
-            ),
           ],
         ),
       ],

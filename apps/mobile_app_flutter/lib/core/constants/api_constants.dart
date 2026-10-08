@@ -4,4 +4,4 @@ class ApiConstants {
 
   static const String routeEndpoint =
       '/api/v1/navigation/route';
-}
+} 

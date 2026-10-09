@@ -45,7 +45,7 @@ def route(
     source_lon: float,
     destination_lat: float,
     destination_lon: float,
-    profile: str = "walking_balanced",
+    profile: str = "driving_balanced",
     db: Session = Depends(get_db)
 ):
 

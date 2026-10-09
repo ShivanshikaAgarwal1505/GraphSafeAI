@@ -1,140 +1,21 @@
-{
-  "profile": "walking_safe",
-  "baseline_distance_km": 5.151,
-  "max_allowed_distance_km": 6.191,
-  "source_node": 30920,
-  "destination_node": 45342,
-  "route": [
-    45340,
-    45341,
-    45342
-  ],
-  "route_length": 181,
+route_length": 311,
   "metrics": {
-    "distance_km": 5.153,
-    "hop_count": 181
+    "distance_km": 12.147,
+    "hop_count": 311
   },
   "risk_metrics": {
-    "average_risk": 0.1839,
-    "max_risk": 0.2291,
-    "risk_node_count": 181
+    "average_risk": 0.1909,
+    "max_risk": 0.248,
+    "risk_node_count": 311
   }
-}
-{
-  "profile": "walking_safe",
-  "baseline_distance_km": 5.151,
-  "max_allowed_distance_km": 6.191,
-  "source_node": 30920,
-  "destination_node": 45342,
-  "route": [
-    199158,
-    199159,
-    15459,
-    199160,
-    199161,
-    199162,
-    63572,
-    199163,
-    199164,
-    199165,
-    199166,
-    63701,
-    383134,
-    383135,
-    383136,
-    48005,
-    383137
-  ],
-  "route_length": 181,
+
+  "route_length": 298,
   "metrics": {
-    "distance_km": 5.153,
-    "hop_count": 181
+    "distance_km": 12.147,
+    "hop_count": 298
   },
   "risk_metrics": {
-    "average_risk": 0.187,
-    "max_risk": 0.2898,
-    "risk_node_count": 181
+    "average_risk": 0.1909,
+    "max_risk": 0.248,
+    "risk_node_count": 298
   }
-}
-{
-  "profile": "walking_fastest",
-  "baseline_distance_km": 5.151,
-  "max_allowed_distance_km": 5.161,
-  "source_node": 30920,
-  "destination_node": 45342,
-  "route": [
-    30920,
-    383136,
-    48005,
-    383137,
-    329128,
-    407367,
-    407368,
-    407369,
-    407370,
-    407371,
-    407372,
-    407373,
-    386380,
-    279453,
-    45340,
-    45341,
-    45342
-  ],
-  "route_length": 184,
-  "metrics": {
-    "distance_km": 5.151,
-    "hop_count": 184
-  },
-  "risk_metrics": {
-    "average_risk": 0.1858,
-    "max_risk": 0.2291,
-    "risk_node_count": 184
-  }
-}
-
-{
-  "profile": "walking_balanced",
-  "baseline_distance_km": 5.151,
-  "max_allowed_distance_km": 5.676,
-  "source_node": 30920,
-  "destination_node": 45342,
-  "route": [
-    45340,
-    45341,
-    45342
-  ],
-  "route_length": 181,
-  "metrics": {
-    "distance_km": 5.153,
-    "hop_count": 181
-  },
-  "risk_metrics": {
-    "average_risk": 0.1839,
-    "max_risk": 0.2291,
-    "risk_node_count": 181
-  }
-}
-
-{
-  "region_id": 3236,
-  "report_count": 11,
-  "open_reports": 11,
-  "resolved_reports": 0,
-  "rejected_reports": 0,
-  "categories": {
-    "theft": 6,
-    "harassment": 5
-  }
-}
-"id"	"region_id"	"report_count"	"avg_severity"	"neighbor_report_count"	"neighbor_avg_severity"	"degree"	"safety_score"	"high_severity_count"	"recent_report_count"	"incident_diversity"	"neighbor_incident_diversity"	"reports_last_7_days"	"reports_last_30_days"	"reports_last_90_days"	"incident_growth_rate"	"structural_risk"	"incident_risk"	"incident_confidence"	"structural_weight"	"incident_weight"	"final_risk"
-82180	3236	11	4.454545454545454	0	0	7	0.33521020895558407	11	11	2	0	11	11	11	1	0.15537725823505166	0.6047727272727274	0.6671289163019205	0.5998336362722521	0.4001663637277479	0.33521020895558407
-
-{
-  "id": 3236,
-  "prediction_score": 0.18383090198040009,
-  "generated_at": "2026-09-08T06:06:44.015456",
-  "model_version": "2",
-  "region_id": 3236
-}
-

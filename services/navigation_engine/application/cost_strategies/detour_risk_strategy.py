@@ -82,12 +82,18 @@ class DetourRiskStrategy:
         #         f"Node={node_id}, Risk={risk}"
         #     )
 
-        return (
-            distance_km
-            *
-            (
-                1.0 + risk
-            )
+        if self.profile.endswith("balanced"):
+            risk_multiplier = 5
+
+        elif self.profile.endswith("safe"):
+            risk_multiplier = 15
+
+        else:
+            risk_multiplier = 1
+
+        return distance_km * (
+            1.0 +
+            risk * risk_multiplier
         )
         
     # def get_risk(

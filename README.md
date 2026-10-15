@@ -4,6 +4,8 @@ GraphSafeAI is a graph-based urban safety intelligence platform that combines Op
 
 The platform evolves from infrastructure-driven safety assessment toward evidence-driven risk intelligence as real-world incident reports accumulate over time.
 
+https://download.geofabrik.de/asia/india.html
+
 ---
 
 # Vision
